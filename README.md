@@ -45,3 +45,13 @@ mpicc -o circular_shift circular_shift.c
 # use --use-hwthread-cpus to recognize Hyper-threading
 mpirun --use-hwthread-cpus -np 8 ./circular_shift
 ```
+
+##  My_MPI_Comm_size()
+Implement MPI_Comm_size() only using MPI_Init,
+MPI_Comm_Rank, MPI_Send, MPI_Recv, MPI_Barrier, MPI_Finalize
+**Honestly, the solution 100% work isn't exist.**
+```bash
+mpicc -o My_MPI_Comm_size My_MPI_Comm_size.c
+mpirun -np 6 ./My_MPI_Comm_size
+```
+This should not work, because numberofnodes not initial at PE 1-9
