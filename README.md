@@ -35,3 +35,13 @@ Using numerical integration based on the Midpoint Rule for approximating integra
 mpicc -o finding_pi finding_pi.c -lm
 mpirun -np 6 ./finding_pi
 ```
+
+## Circular Shift
+Runs on 8 PEs and does a “circular shift.” This means that every PE sends
+some data to its nearest neighbor either “up” (one PE higher) or “down.” To make it circular,
+PE 7 and PE 0 are treated as neighbors.
+```bash
+mpicc -o circular_shift circular_shift.c
+# use --use-hwthread-cpus to recognize Hyper-threading
+mpirun --use-hwthread-cpus -np 8 ./circular_shift
+```
