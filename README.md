@@ -1,6 +1,25 @@
 # MPI-Examples
 MPI examples
 
+
+## Amdahl’s Law
+
+Amdahl’s Law calculates the **speedup (S)** of a parallel program compared to its serial execution:
+
+$S = \frac{1}{(1 - P) + \frac{P}{N}}$
+
+Where:
+- **S** = Speedup (how many times faster the parallel execution is compared to serial)
+- **P** = The portion of the program that **can be parallelized** (as a percentage)
+- **1 - P** = The portion that **must remain serial** (cannot be parallelized)
+- **N** = Number of processing units (e.g., CPU cores, GPU threads)
+
+This formula shows that the **speedup is limited by the serial portion of the program**. Even with an infinite number of processing units, the maximum achievable speedup is:
+
+$S = \frac{1}{(1 - P) + \frac{P}{N}}$
+
+which means the **serial portion becomes the bottleneck** as N increases.
+
 ## Hello World
 Print Hello World from each processes
 ```bash
@@ -55,3 +74,56 @@ mpicc -o My_MPI_Comm_size My_MPI_Comm_size.c
 mpirun -np 6 ./My_MPI_Comm_size
 ```
 This should not work, because numberofnodes not initial at PE 1-9
+
+## Laplace Solver
+serial_laplace_solver
+```bash
+gcc -o serial_laplace_solver serial_laplace_solver.c -lm
+./serial_laplace_solver
+## Max error at iteration 18477 was 0.001000
+## Total time was 99.293923 seconds.
+```
+
+Parallel Version
+```bash
+/****************************************************************
+ * Laplace MPI C Version
+ *
+ * T is initially 0.0
+ * Boundaries are as follows
+ *
+ *                T                      4 sub-grids
+ *   0  +-------------------+  0    +-------------------+
+ *      |                   |       |                   |
+ *      |                   |       |-------------------|
+ *      |                   |       |                   |
+ *   T  |                   |  T    |-------------------|
+ *      |                   |       |                   |
+ *      |                   |       |-------------------|
+ *      |                   |       |                   |
+ *   0  +-------------------+ 100   +-------------------+
+ *      0         T       100
+ *
+ * Each PE only has a local subgrid.
+ * Each PE works on a sub grid and then sends
+ * its boundaries to neighbors.
+ *
+ * John Urbanic, PSC 2014
+ *
+ *******************************************************************/
+ ```
+```bash
+mpicc -o parallel_laplace_solver parallel_laplace_solver.c -lm
+mpirun -np 4 ./parallel_laplace_solver
+## Max error at iteration 29182 was 0.001000
+## Total time was 41.817048 seconds.
+```
+
+## Debug and Profiling
+GDB
+```bash
+mpicc -o synchronization synchronization.c
+mpirun -np 4 gdb ./synchronization
+## If GUI
+mpirun -np 4 xterm -e gdb ./synchronization
+```
