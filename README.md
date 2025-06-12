@@ -1,5 +1,6 @@
-# MPI-Examples
+# Parallel-Examples
 MPI examples
+OpenMP(OMP) examples
 
 
 ## Amdahl’s Law
