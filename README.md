@@ -128,3 +128,13 @@ mpirun -np 4 gdb ./synchronization
 ## If GUI
 mpirun -np 4 xterm -e gdb ./synchronization
 ```
+
+# OpenMP(OMP)
+
+## OpenMP environment variable
+```bash
+export OMP_PLACES=cores
+export OMP_PROC_BIND=true
+# if finetune perf
+export OMP_NUM_THREADS=6
+```
