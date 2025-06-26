@@ -1,6 +1,7 @@
 # Parallel-Examples
 MPI examples
 OpenMP(OMP) examples
+CUDA & PyCUDA examples
 
 
 ## Amdahl’s Law
@@ -284,3 +285,33 @@ For best OpenMP performance:
 - Consider NUMA effects in memory allocation (first-touch policy)
 - Minimize synchronization points between parallel regions
 - Balance workload among threads for optimal scaling
+
+# CUDA & PyCUDA
+
+CUDA (Compute Unified Device Architecture) is NVIDIA's parallel computing platform and programming model for GPUs. PyCUDA provides Python bindings for CUDA, allowing you to write GPU-accelerated code in Python.
+
+## Setup Virtual Environment and Install PyCUDA
+
+Create a virtual environment for Python CUDA development:
+
+```bash
+# Create virtual environment
+python3 -m venv cuda_env
+
+# Activate virtual environment
+source cuda_env/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+
+# Install PyCUDA
+pip install pycuda
+```
+
+To deactivate the virtual environment when done:
+
+```bash
+deactivate
+```
+
+**Note**: PyCUDA requires NVIDIA CUDA toolkit to be installed on your system. Make sure you have compatible NVIDIA drivers and CUDA toolkit installed before installing PyCUDA.
