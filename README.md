@@ -1,7 +1,7 @@
 # Parallel-Examples
 MPI examples
 OpenMP(OMP) examples
-CUDA & PyCUDA examples
+CUDA examples
 
 
 ## Amdahl’s Law
@@ -286,32 +286,37 @@ For best OpenMP performance:
 - Minimize synchronization points between parallel regions
 - Balance workload among threads for optimal scaling
 
-# CUDA & PyCUDA
+# CUDA
 
-CUDA (Compute Unified Device Architecture) is NVIDIA's parallel computing platform and programming model for GPUs. PyCUDA provides Python bindings for CUDA, allowing you to write GPU-accelerated code in Python.
+CUDA (Compute Unified Device Architecture) is NVIDIA's parallel computing platform and programming model for GPUs.
 
-## Setup Virtual Environment and Install PyCUDA
+## Native CUDA Examples
 
-Create a virtual environment for Python CUDA development:
+This repo includes two plain CUDA C++ examples in `CUDA/`:
 
-```bash
-# Create virtual environment
-python3 -m venv cuda_env
+- `vecAdd/vecAdd.cu`: Vector addition using 1D grid/block launch
+- `matrixMultiply/matrixMultiply.cu`: Dense matrix multiplication (naive) using a 2D grid (currently no shared-memory tiling)
 
-# Activate virtual environment
-source cuda_env/bin/activate
+### Data Layout
 
-# Upgrade pip
-pip install --upgrade pip
+Each program reads simple text files from its local `data/` subfolder:
 
-# Install PyCUDA
-pip install pycuda
-```
+- Vector add: `input1.txt`, `input2.txt` (one float per whitespace) -> writes `output.txt`
+- Matrix multiply: `A.txt`, `B.txt` each start with: `rows cols` on the first line, followed by all elements row-major; output written to `C.txt` with the same header format.
 
-To deactivate the virtual environment when done:
+### Quick Compile & Run (without libwb)
 
 ```bash
-deactivate
+# From repository root
+cd CUDA/vecAdd
+nvcc vecAdd.cu -o vecAdd
+./vecAdd
+
+cd ../matrixMultiply
+nvcc matrixMultiply.cu -o matrixMultiply
+./matrixMultiply
 ```
 
-**Note**: PyCUDA requires NVIDIA CUDA toolkit to be installed on your system. Make sure you have compatible NVIDIA drivers and CUDA toolkit installed before installing PyCUDA.
+### Hardware Note (RTX 30 Series GPU)
+
+Parameters like `blockDim = 512` in `vecAdd.cu` and `TILE_WIDTH = 16` in `matrixMultiply.cu` were chosen to run reasonably well on a typical NVIDIA RTX 30 (Ampere) GPU. They are simple, readable defaults rather than fully optimized values.
