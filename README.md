@@ -292,14 +292,15 @@ CUDA (Compute Unified Device Architecture) is NVIDIA's parallel computing platfo
 
 ## Native CUDA Examples
 
-This repo includes two plain CUDA C++ examples in `CUDA/`:
+This repo includes CUDA C++ examples in `CUDA/`:
 
 - `vecAdd/vecAdd.cu`: Vector addition using 1D grid/block launch
-- `matrixMultiply/matrixMultiply.cu`: Dense matrix multiplication (naive) using a 2D grid (currently no shared-memory tiling)
+- `matrixMultiply/matrixMultiply.cu`: Dense matrix multiplication (naive, no shared memory)
+- `matrixMultiplyShared/matrixMultiplyShared.cu`: Matrix multiplication with shared-memory tiling (TILE_WIDTH=16)
 
 ### Data Layout
 
-Each program reads simple text files from its local `data/` subfolder:
+Each program reads simple text files from its local `data/` subfolder (shared-memory version uses the same format as the naive one):
 
 - Vector add: `input1.txt`, `input2.txt` (one float per whitespace) -> writes `output.txt`
 - Matrix multiply: `A.txt`, `B.txt` each start with: `rows cols` on the first line, followed by all elements row-major; output written to `C.txt` with the same header format.
@@ -315,6 +316,11 @@ nvcc vecAdd.cu -o vecAdd
 cd ../matrixMultiply
 nvcc matrixMultiply.cu -o matrixMultiply
 ./matrixMultiply
+
+# Shared-memory tiled version (same input data format)
+cd ../matrixMultiplyShared
+nvcc matrixMultiplyShared.cu -o matrixMultiplyShared
+./matrixMultiplyShared
 ```
 
 ### Hardware Note (RTX 30 Series GPU)
