@@ -297,6 +297,8 @@ This repo includes CUDA C++ examples in `CUDA/`:
 - `vecAdd/vecAdd.cu`: Vector addition using 1D grid/block launch
 - `matrixMultiply/matrixMultiply.cu`: Dense matrix multiplication (naive, no shared memory)
 - `matrixMultiplyShared/matrixMultiplyShared.cu`: Matrix multiplication with shared-memory tiling (TILE_WIDTH=16)
+ - `convKernel/1dConvKernel.cu`: 1D convolution (basic global-memory version + constant memory mask variant)
+ - `convKernel/tiled1dConvKernel.cu`: 1D convolution with two shared-memory tiling strategies (halo loading vs on-demand hybrid)
 
 ### Data Layout
 
@@ -321,6 +323,11 @@ nvcc matrixMultiply.cu -o matrixMultiply
 cd ../matrixMultiplyShared
 nvcc matrixMultiplyShared.cu -o matrixMultiplyShared
 ./matrixMultiplyShared
+
+# 1D Convolution kernels (adjust file names / add host driver as needed)
+cd ../../convKernel
+nvcc 1dConvKernel.cu -o conv1d_basic
+nvcc tiled1dConvKernel.cu -o conv1d_tiled
 ```
 
 ### Hardware Note (RTX 30 Series GPU)
