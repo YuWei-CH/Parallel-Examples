@@ -1,12 +1,33 @@
 # Parallel-Examples
-MPI examples
-OpenMP(OMP) examples
-CUDA examples
 
+## Purpose
+This repo include Parallel Tutorial/Workshop examples:
+Point to each's readme.# Parallel Computing Examples
 
-## Amdahl’s Law
+This repository contains hands-on examples for three major parallel computing technologies: MPI, OpenMP, and CUDA. Each technology folder includes practical implementations with detailed documentation.
 
-Amdahl’s Law calculates the **speedup (S)** of a parallel program compared to its serial execution:
+## Technologies Covered
+
+### [MPI (Message Passing Interface)](MPI/README.md)
+- Distributed memory parallel computing
+- Examples include basic communication patterns, synchronization, and a parallel Laplace solver
+- Best for multi-node cluster computing
+
+### [OpenMP (Open Multi-Processing)](OpenMP/README.md)
+- Shared memory parallel computing for multi-core CPUs
+- Examples include vector addition, stencil computations, and reduction operations
+- Best for single-node multi-core systems
+
+### [CUDA](CUDA/README.md)
+- GPU parallel computing platform by NVIDIA
+- Examples include vector addition, matrix multiplication, convolution, and histogram computation
+- Best for data-parallel computations on compatible NVIDIA GPUs
+
+## Key Concept
+
+### Amdahl's Law
+
+Amdahl's Law calculates the **speedup (S)** of a parallel program compared to its serial execution:
 
 $S = \frac{1}{(1 - P) + \frac{P}{N}}$
 
@@ -18,318 +39,27 @@ Where:
 
 This formula shows that the **speedup is limited by the serial portion of the program**. Even with an infinite number of processing units, the maximum achievable speedup is:
 
-$S = \frac{1}{(1 - P) + \frac{P}{N}}$
+$\lim_{N\to\infty} S = \frac{1}{1 - P}$
 
 which means the **serial portion becomes the bottleneck** as N increases.
 
-## Hello World
-Print Hello World from each processes
-```bash
-# Compile
-mpicc -o hello_world hello_world.c
-# Run with 8 process
-mpirun -np 8 ./hello_world
-```
-
-## Send_and_Receive
-It will run on 2 PEs and will send a simple message (the number 42) from PE 1 to PE 0. PE 0 will then print this out.
-```bash
-mpicc -o send_and_receive send_and_receive.c
-mpirun -np 2 ./send_and_receive
-```
-
-## Synchronization
-Our code will perform the rather pointless operations of:
-1. Have PE 0 send a number to the other 3 PEs
-2. have them multiply that number by their own PE number
-3. they will then print the results out, in order
-4. and send them back to PE 0
-5. which will print out the sum.
-```bash
-mpicc -o synchronization synchronization.c
-mpirun -np 4 ./synchronization
-```
-
-## Finding Pi
-Using numerical integration based on the Midpoint Rule for approximating integrals to calculate PI.
-```bash
-mpicc -o finding_pi finding_pi.c -lm
-mpirun -np 6 ./finding_pi
-```
-
-## Circular Shift
-Runs on 8 PEs and does a “circular shift.” This means that every PE sends
-some data to its nearest neighbor either “up” (one PE higher) or “down.” To make it circular,
-PE 7 and PE 0 are treated as neighbors.
-```bash
-mpicc -o circular_shift circular_shift.c
-# use --use-hwthread-cpus to recognize Hyper-threading
-mpirun --use-hwthread-cpus -np 8 ./circular_shift
-```
-
-##  My_MPI_Comm_size()
-Implement MPI_Comm_size() only using MPI_Init,
-MPI_Comm_Rank, MPI_Send, MPI_Recv, MPI_Barrier, MPI_Finalize
-**Honestly, the solution 100% work isn't exist.**
-```bash
-mpicc -o My_MPI_Comm_size My_MPI_Comm_size.c
-mpirun -np 6 ./My_MPI_Comm_size
-```
-This should not work, because numberofnodes not initial at PE 1-9
-
-## Laplace Solver
-serial_laplace_solver
-```bash
-gcc -o serial_laplace_solver serial_laplace_solver.c -lm
-./serial_laplace_solver
-## Max error at iteration 18477 was 0.001000
-## Total time was 99.293923 seconds.
-```
-
-Parallel Version
-```bash
-/****************************************************************
- * Laplace MPI C Version
- *
- * T is initially 0.0
- * Boundaries are as follows
- *
- *                T                      4 sub-grids
- *   0  +-------------------+  0    +-------------------+
- *      |                   |       |                   |
- *      |                   |       |-------------------|
- *      |                   |       |                   |
- *   T  |                   |  T    |-------------------|
- *      |                   |       |                   |
- *      |                   |       |-------------------|
- *      |                   |       |                   |
- *   0  +-------------------+ 100   +-------------------+
- *      0         T       100
- *
- * Each PE only has a local subgrid.
- * Each PE works on a sub grid and then sends
- * its boundaries to neighbors.
- *
- * John Urbanic, PSC 2014
- *
- *******************************************************************/
- ```
-```bash
-mpicc -o parallel_laplace_solver parallel_laplace_solver.c -lm
-mpirun -np 4 ./parallel_laplace_solver
-## Max error at iteration 29182 was 0.001000
-## Total time was 41.817048 seconds.
-```
-
-## Debug and Profiling
-GDB
-```bash
-mpicc -o synchronization synchronization.c
-mpirun -np 4 gdb ./synchronization
-## If GUI
-mpirun -np 4 xterm -e gdb ./synchronization
-```
-
-# OpenMP(OMP)
-
-## OpenMP environment variable
-```bash
-export OMP_PLACES=cores
-export OMP_PROC_BIND=true
-# if finetune perf
-export OMP_NUM_THREADS=6
-```
-
-# OpenMP Examples
-
-OpenMP (Open Multi-Processing) is an API that supports multi-platform shared memory multiprocessing programming in C, C++, and Fortran. It provides a simple and flexible interface for developing parallel applications on shared memory architectures.
-
-## Compiling OpenMP Programs
-
-All OpenMP programs can be compiled using:
-
-```bash
-# With GCC
-gcc -fopenmp program.c -o program
-
-# With CMake (using provided CMakeLists.txt)
-mkdir build && cd build
-cmake ..
-make
-```
-
-## Hello OpenMP
-
-Simple demonstration of OpenMP parallel region:
-
-```bash
-gcc -fopenmp HelloOpenMP.c -o hello_openmp
-./hello_openmp
-```
-
-## Variable Scoping in OpenMP
-
-Demonstrates private vs shared variables in OpenMP:
-
-```bash
-gcc -fopenmp variable.c malloc2D.c -o variable
-./variable
-```
-
-This example shows how different variable scopes (private, shared, etc.) behave in parallel regions.
-
-## Vector Addition Examples
-
-Several vector addition implementations with different optimizations:
-
-- `vecadd_opt.c`: Serial implementation
-- `vecadd_opt1.c`: Basic OpenMP parallelization
-- `vecadd_opt2.c`: OpenMP with first-touch optimization (better NUMA performance)
-
-```bash
-gcc -fopenmp vecadd_opt.c timer.c -o vecadd_opt
-gcc -fopenmp vecadd_opt1.c timer.c -o vecadd_opt1
-gcc -fopenmp vecadd_opt2.c timer.c -o vecadd_opt2
-```
-
-Run and compare performance:
-
-```bash
-./vecadd_opt
-./vecadd_opt1
-./vecadd_opt2
-```
-
-## Understanding Stencil Computations
-
-Stencil computations are a pattern commonly used in numerical methods for solving partial differential equations, image processing, and cellular automata. A stencil defines a fixed pattern that is applied to each element in a grid, where each output value depends on the corresponding input value and its neighbors.
-
-### What is a Stencil?
-
-In a stencil operation, each point in a multi-dimensional grid is updated with a weighted sum of neighboring points. For example, in a 5-point stencil (commonly used in 2D heat diffusion):
-
-```
-                    ┌───┐
-                    │ N │
-                    └───┘
-            ┌───┐   ┌───┐   ┌───┐
-            │ W │   │ C │   │ E │
-            └───┘   └───┘   └───┘
-                    ┌───┐
-                    │ S │
-                    └───┘
-```
-
-Here, the new value at the Center point is computed as a function of its North, South, East, West neighbors.
-
-### Stencil Examples (stencil_opt*.c)
-
-The repository contains multiple stencil implementations with different optimization techniques:
-
-- `stencil_opt2.c`: Basic parallelized stencil
-- `stencil_opt3.c`: Optimized with nowait clause
-- `stencil_opt4.c`: Using persistent parallel regions
-- `stencil_opt6.c`: Advanced optimization with manual work distribution
-
-Compilation:
-
-```bash
-gcc -fopenmp stencil_opt2.c malloc2D.c timer.c -o stencil_opt2
-gcc -fopenmp stencil_opt3.c malloc2D.c timer.c -o stencil_opt3
-gcc -fopenmp stencil_opt4.c malloc2D.c timer.c -o stencil_opt4
-gcc -fopenmp stencil_opt6.c malloc2D.c timer.c -o stencil_opt6
-```
-
-Run and compare performance:
-
-```bash
-./stencil_opt2
-./stencil_opt3
-./stencil_opt4
-./stencil_opt6
-```
-
-Each version demonstrates different optimization techniques:
-- Basic parallelization with OpenMP directives
-- Memory access pattern optimization
-- Reducing synchronization overhead
-- Thread affinity and data locality improvements
-- Manual work distribution for better load balancing
-
-## Reduction Example
-
-Simple example showing reduction operations in OpenMP:
-
-```bash
-# This is part of a larger file in the examples
-gcc -fopenmp -c serial_sum_novec.c
-
-# The function demonstrates parallel reduction:
-# double do_sum_novec(double *restrict var, long ncells)
-# {
-#     double sum = 0.0;
-#     #pragma omp parallel for reduction(+ : sum)
-#     for (long i = 0; i < ncells; ++i)
-#     {
-#         sum += var[i];
-#     }
-#     return sum;
-# }
-```
-
-## Performance Tips
-
-For best OpenMP performance:
-- Set thread affinity correctly with `OMP_PLACES=cores` and `OMP_PROC_BIND=true`
-- Adjust thread count to match your CPU with `OMP_NUM_THREADS=N`
-- Consider NUMA effects in memory allocation (first-touch policy)
-- Minimize synchronization points between parallel regions
-- Balance workload among threads for optimal scaling
-
-# CUDA
-
-CUDA (Compute Unified Device Architecture) is NVIDIA's parallel computing platform and programming model for GPUs.
-
-## Native CUDA Examples
-
-This repo includes CUDA C++ examples in `CUDA/`:
-
-- `vecAdd/vecAdd.cu`: Vector addition using 1D grid/block launch
-- `matrixMultiply/matrixMultiply.cu`: Dense matrix multiplication (naive, no shared memory)
-- `matrixMultiplyShared/matrixMultiplyShared.cu`: Matrix multiplication with shared-memory tiling (TILE_WIDTH=16)
- - `convKernel/1dConvKernel.cu`: 1D convolution (basic global-memory version + constant memory mask variant)
- - `convKernel/tiled1dConvKernel.cu`: 1D convolution with two shared-memory tiling strategies (halo loading vs on-demand hybrid)
-
-### Data Layout
-
-Each program reads simple text files from its local `data/` subfolder (shared-memory version uses the same format as the naive one):
-
-- Vector add: `input1.txt`, `input2.txt` (one float per whitespace) -> writes `output.txt`
-- Matrix multiply: `A.txt`, `B.txt` each start with: `rows cols` on the first line, followed by all elements row-major; output written to `C.txt` with the same header format.
-
-### Quick Compile & Run (without libwb)
-
-```bash
-# From repository root
-cd CUDA/vecAdd
-nvcc vecAdd.cu -o vecAdd
-./vecAdd
-
-cd ../matrixMultiply
-nvcc matrixMultiply.cu -o matrixMultiply
-./matrixMultiply
-
-# Shared-memory tiled version (same input data format)
-cd ../matrixMultiplyShared
-nvcc matrixMultiplyShared.cu -o matrixMultiplyShared
-./matrixMultiplyShared
-
-# 1D Convolution kernels (adjust file names / add host driver as needed)
-cd ../../convKernel
-nvcc 1dConvKernel.cu -o conv1d_basic
-nvcc tiled1dConvKernel.cu -o conv1d_tiled
-```
-
-### Hardware Note (RTX 30 Series GPU)
-
-Parameters like `blockDim = 512` in `vecAdd.cu` and `TILE_WIDTH = 16` in `matrixMultiply.cu` were chosen to run reasonably well on a typical NVIDIA RTX 30 (Ampere) GPU. They are simple, readable defaults rather than fully optimized values.
+## References & Resources
+
+### MPI Resources
+- [PSC MPI Workshop](https://www.psc.edu/)
+- [MPI Tutorial](https://mpitutorial.com/tutorials/)
+- *Parallel and High Performance Computing* by Robert Robey and Yuliana Zamora
+
+### OpenMP Resources
+- *Parallel and High Performance Computing* by Robert Robey and Yuliana Zamora
+
+### CUDA Resources
+- *Programming Massively Parallel Processors (PMPP)*
+- [NVIDIA CUDA C Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html)
+
+## Contribution
+Feel free to PR if you want to add more examples. 
+Examples are tested with:
+OS: Ubuntu 22.04 LTS
+CPU: AMD rx5600x
+GPU: Nvidia RTX 3060 (Ampere Arch)
